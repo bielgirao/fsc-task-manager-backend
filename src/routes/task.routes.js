@@ -6,46 +6,23 @@ const TaskModel = require('../models/task.model');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    return new TaskController(req, res).getTasks();
+    return new TaskController(req, res).getAll();
 });
 
 router.get('/:id', async (req, res) => {
-    return new TaskController(req, res).getTaskById();
+    return new TaskController(req, res).getById();
 });
 
 router.post('/', async (req, res) => {
-    return new TaskController(req, res).createTask();
+    return new TaskController(req, res).create();
 });
 
 router.patch('/:id', async (req, res) => {
-    try {
-        const taskId = req.params.id;
-        const taskData = req.body;
-        const taskToUpdate = await TaskModel.findById(taskId);
-        const allowedUpdates = ['isCompleted'];
-        const requestedUpdates = Object.keys(taskData);
-        for (update of requestedUpdates) {
-            if (allowedUpdates.includes(update)) {
-                taskToUpdate[update] = taskData[update];
-            } else {
-                return res
-                    .status(500)
-                    .send(
-                        `The field "${update}" is not allowed to be updated.`
-                    );
-            }
-        }
-        await taskToUpdate.save();
-        return res
-            .status(200)
-            .send({ message: 'Task updated successfully.', taskToUpdate });
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
+    return new TaskController(req, res).update();
 });
 
 router.delete('/:id', async (req, res) => {
-    return new TaskController(req, res).deleteTask();
+    return new TaskController(req, res).delete();
 });
 
 module.exports = router;

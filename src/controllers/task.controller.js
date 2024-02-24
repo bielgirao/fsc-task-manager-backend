@@ -6,7 +6,7 @@ class TaskController {
         this.res = res;
     }
 
-    async getTasks() {
+    async getAll() {
         try {
             const tasks = await TaskModel.find();
             this.res.status(200).send(tasks);
@@ -15,7 +15,7 @@ class TaskController {
         }
     }
 
-    async getTaskById() {
+    async getById() {
         try {
             const taskId = this.req.params.id;
             const task = await TaskModel.findById(taskId);
@@ -30,7 +30,7 @@ class TaskController {
         }
     }
 
-    async createTask() {
+    async create() {
         try {
             const newTask = new TaskModel(this.req.body);
             await newTask.save();
@@ -43,7 +43,34 @@ class TaskController {
         }
     }
 
-    async deleteTask() {
+    async update() {
+        try {
+            const taskId = this.req.params.id;
+            const taskData = this.req.body;
+            const taskToUpdate = await TaskModel.findById(taskId);
+            const allowedUpdates = ['isCompleted'];
+            const requestedUpdates = Object.keys(taskData);
+            for (const update of requestedUpdates) {
+                if (allowedUpdates.includes(update)) {
+                    taskToUpdate[update] = taskData[update];
+                } else {
+                    return this.res
+                        .status(500)
+                        .send(
+                            `The field "${update}" is not allowed to be updated.`
+                        );
+                }
+            }
+            await taskToUpdate.save();
+            return this.res
+                .status(200)
+                .send({ message: 'Task updated successfully.', taskToUpdate });
+        } catch (error) {
+            this.res.status(500).send(error.message);
+        }
+    }
+
+    async delete() {
         try {
             const taskId = this.req.params.id;
             const taskToDelete = await TaskModel.findById(taskId);
