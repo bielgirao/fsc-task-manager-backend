@@ -14,6 +14,34 @@ class TaskController {
             this.res.status(500).send(error.message);
         }
     }
+
+    async getTaskById() {
+        try {
+            const taskId = this.req.params.id;
+            const task = await TaskModel.findById(taskId);
+
+            if (!task) {
+                this.res.status(404).send('Task not found.');
+            }
+
+            this.res.status(200).send(task);
+        } catch (error) {
+            this.res.status(500).send(error.message);
+        }
+    }
+
+    async createTask() {
+        try {
+            const newTask = new TaskModel(this.req.body);
+            await newTask.save();
+            this.res.status(201).send({
+                message: 'Task created successfully.',
+                newTask,
+            });
+        } catch (error) {
+            this.res.status(500).send(error.message);
+        }
+    }
 }
 
 module.exports = TaskController;

@@ -10,29 +10,11 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-    try {
-        const taskId = req.params.id;
-        const task = await TaskModel.findById(taskId);
-
-        if (!task) {
-            res.status(404).send('Task not found.');
-        }
-
-        res.status(200).send(task);
-    } catch (error) {}
+    return new TaskController(req, res).getTaskById();
 });
 
 router.post('/', async (req, res) => {
-    try {
-        const newTask = new TaskModel(req.body);
-        await newTask.save();
-        res.status(201).send({
-            message: 'Task created successfully.',
-            newTask,
-        });
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
+    return new TaskController(req, res).createTask();
 });
 
 router.patch('/:id', async (req, res) => {
